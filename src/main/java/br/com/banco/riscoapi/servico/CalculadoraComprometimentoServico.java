@@ -1,30 +1,39 @@
-package br.com.banco.riscoapi.util;
+package br.com.banco.riscoapi.servico;
 
+import br.com.banco.riscoapi.excecao.RegraDeNegocioException;
 import br.com.banco.riscoapi.modelo.Empresa;
 import br.com.banco.riscoapi.modelo.Pessoa;
-import br.com.banco.riscoapi.servico.EmpresaServico;
+import br.com.banco.riscoapi.repositorio.EmpresaRepositorio;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CalculadoraComprometimento {
-    private List<String> pessoaFisicas;
-    private List<String> pessoaJuridicas;
+@Service
+public class CalculadoraComprometimentoServico {
+    private List<String> pessoaFisicas = new ArrayList<>();
+    private List<String> pessoaJuridicas = new ArrayList<>();
     private Pessoa pessoaJuridica;
     private Double comprometimentoFinanceiro;
     @Autowired
-    private EmpresaServico empresaServico;
-    public CalculadoraComprometimento(Empresa empresa) {
-        this.pessoaJuridicas.add(empresa.getPessoaJuridica().getCpfCnpj());
-        this.pessoaJuridica = empresa.getPessoaJuridica();
-        this.comprometimentoFinanceiro = empresa.getPessoaJuridica().getBemImovel();
-        this.comprometimentoFinanceiro = calcularComprometimentoFinanceiro(empresa.getQuadroSocietario());
+    private EmpresaRepositorio empresaRepositorio;
+
+    public Double calcularComprometimentoFinanceiro(Empresa empresa) {
+        pessoaFisicas.clear();
+        pessoaJuridicas.clear();
+        comprometimentoFinanceiro = 0.;
+        pessoaJuridicas.add(empresa.getPessoaJuridica().getCpfCnpj());
+        pessoaJuridica = empresa.getPessoaJuridica();
+        comprometimentoFinanceiro = empresa.getPessoaJuridica().getBemImovel();
+        comprometimentoFinanceiro = calcularComprometimentoFinanceiro(empresa.getQuadroSocietario());
+        return comprometimentoFinanceiro;
     }
     private Double calcularComprometimentoFinanceiro(List<Pessoa> socios){
         List<Pessoa> pessoasFisica = socios.stream()
@@ -53,8 +62,13 @@ public class CalculadoraComprometimento {
         if(!pessoaJuridicas.contains(pessoaJuridica.getCpfCnpj())){
             pessoaJuridicas.add(pessoaJuridica.getCpfCnpj());
             comprometimentoFinanceiro += pessoaJuridica.getBemImovel();
-            Empresa pessoaJuridicaNova = empresaServico.buscarEmpresaPorPessoaJuridicaId(pessoaJuridica.getId());
-            calcularComprometimentoFinanceiro(pessoaJuridicaNova.getQuadroSocietario());
+            Optional<Empresa> empresaOptional = empresaRepositorio.findByPessoaJuridicaId(pessoaJuridica.getId());
+            if(empresaOptional.isPresent()){
+                calcularComprometimentoFinanceiro(empresaOptional.get().getQuadroSocietario());;
+            } else {
+                throw new RegraDeNegocioException(
+                        String.format("Empresa %s não encontrada!", pessoaJuridica.getId()));
+            }
         }
 
     }

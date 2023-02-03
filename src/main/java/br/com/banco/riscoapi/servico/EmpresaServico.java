@@ -1,10 +1,9 @@
 package br.com.banco.riscoapi.servico;
 
-import br.com.banco.riscoapi.exceptopn.RegraDeNegocioException;
+import br.com.banco.riscoapi.excecao.RegraDeNegocioException;
 import br.com.banco.riscoapi.modelo.Empresa;
 import br.com.banco.riscoapi.modelo.Pessoa;
 import br.com.banco.riscoapi.repositorio.EmpresaRepositorio;
-import br.com.banco.riscoapi.util.CalculadoraComprometimento;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
@@ -18,8 +17,8 @@ public class EmpresaServico {
     private EmpresaRepositorio empresaRepositorio;
     @Autowired
     private PessoaServico pessoaServico;
-
-    CalculadoraComprometimento calculadora;
+    @Autowired
+    CalculadoraComprometimentoServico calculadora;
 
     @Transactional
     public Empresa salvarEmpresa(Long id, List<String> pessoasDTO) {
@@ -84,8 +83,8 @@ public class EmpresaServico {
     public Empresa calcularPorId(Long id) {
         Optional<Empresa> empresaOptional = empresaRepositorio.findById(id);
         if(empresaOptional.isPresent()){
-            calculadora = new CalculadoraComprometimento(empresaOptional.get());
-            empresaOptional.get().setComprometimentoFinanceiro(calculadora.getComprometimentoFinanceiro());
+            empresaOptional.get().setComprometimentoFinanceiro(calculadora
+                    .calcularComprometimentoFinanceiro(empresaOptional.get()));
             return empresaRepositorio.save(empresaOptional.get());
         } else {
             throw new RegraDeNegocioException(
@@ -93,7 +92,7 @@ public class EmpresaServico {
         }
     }
 
-    public Empresa buscarEmpresaPorPessoaJuridicaId(Long id) {
+/*    public Empresa buscarEmpresaPorPessoaJuridicaId(Long id) {
         Optional<Empresa> empresaOptional = empresaRepositorio.findByPessoaJuridicaId(id);
         if(empresaOptional.isPresent()){
             return empresaOptional.get();
@@ -101,5 +100,5 @@ public class EmpresaServico {
             throw new RegraDeNegocioException(
                     String.format("Empresa %s não encontrada!", id));
         }
-    }
+    }*/
 }

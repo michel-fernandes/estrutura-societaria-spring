@@ -1,6 +1,6 @@
 package br.com.banco.riscoapi.servico;
 
-import br.com.banco.riscoapi.exceptopn.RegraDeNegocioException;
+import br.com.banco.riscoapi.excecao.RegraDeNegocioException;
 import br.com.banco.riscoapi.modelo.Pessoa;
 import br.com.banco.riscoapi.repositorio.PessoaRepositorio;
 import org.springframework.beans.BeanUtils;

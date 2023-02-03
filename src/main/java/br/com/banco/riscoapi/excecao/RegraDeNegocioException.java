@@ -1,4 +1,4 @@
-package br.com.banco.riscoapi.exceptopn;
+package br.com.banco.riscoapi.excecao;
 
 public class RegraDeNegocioException extends RuntimeException{
     

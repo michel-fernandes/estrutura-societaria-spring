@@ -59,10 +59,10 @@ public class PessoaControlador {
     @PostMapping("/{id}/empresa")
     public ResponseEntity<Object> salvarEmpresa(@PathVariable(value = "id") Long id,
                                                                  @RequestBody @Valid EmpresaDTO empresaDTO){
-        if (empresaDTO.getPessoasDTO().size()<1)
+        if (empresaDTO.getSociosCpfCnpj().size()<1)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro: deve conter ao menos um socio.");
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                empresaServico.salvarEmpresa(id, empresaDTO.getPessoasDTO()));
+                empresaServico.salvarEmpresa(id, empresaDTO.getSociosCpfCnpj()));
     }
 
     @ApiOperation(value = "Calcular Comprometimento Financeiro", nickname = "calcularCompreometimentoFinanceiro")

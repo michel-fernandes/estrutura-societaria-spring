@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "TB_PESSOA_JURIDICA")
+@Table(name = "TB_EMPRESA")
 public class Empresa implements Serializable {
     private static final  long serialVersionUID= 1L;
     @Id
@@ -22,8 +22,8 @@ public class Empresa implements Serializable {
     private Long id;
     @OneToOne
     private Pessoa pessoaJuridica;
-    @Column(name = "comprometimentoFinanceiro")
+    @Column(name = "comprometimentoFinanceiro", nullable = true)
     private  Double comprometimentoFinanceiro;
-    @OneToMany
+    @ManyToMany
     private List<Pessoa> quadroSocietario;
 }

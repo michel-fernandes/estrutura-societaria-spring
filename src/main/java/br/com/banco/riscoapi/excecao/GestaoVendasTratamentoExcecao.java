@@ -1,4 +1,4 @@
-package br.com.banco.riscoapi.exceptopn;
+package br.com.banco.riscoapi.excecao;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
